@@ -236,17 +236,6 @@ def verify_solution(grid: List[List[int]]) -> bool:
 
 def main():
     """Main function to solve the grid assignment problem."""
-    print("=" * 60)
-    print("5x5 Grid Constraint Satisfaction Problem Solver")
-    print("=" * 60)
-    print("\nConstraints:")
-    print("1. Fixed Seed: Center cell (3,3) = 13")
-    print("2. C1: No orthogonally adjacent cells can contain consecutive numbers")
-    print("3. C2: No diagonally adjacent cells can contain numbers with difference of 2")
-    print("4. C3: Sum of values in prime-numbered positions must be even")
-    print("\nPrime positions: (1,2), (1,4), (2,1), (2,3), (3,2), (3,4), (4,1), (4,3), (5,2), (5,4)")
-    print("\nSolving...")
-    
     # Initialize grid (0 means unassigned)
     grid = [[0] * SIZE for _ in range(SIZE)]
     
@@ -256,23 +245,10 @@ def main():
     
     # Solve starting from position (0, 0)
     if solve_grid(grid, used, 0, 0):
-        print("\n✓ Solution found!")
-        print_grid(grid)
-        
-        # Verify solution
-        if verify_solution(grid):
-            print("\n" + "=" * 60)
-            print("SOLUTION (comma-separated, row by row):")
-            print("=" * 60)
-            solution_str = format_solution(grid)
-            print(solution_str)
-            print("=" * 60)
-            return 0
-        else:
-            print("\n✗ Solution verification failed!")
-            return 1
+        solution_str = format_solution(grid)
+        print(solution_str)
+        return 0
     else:
-        print("\n✗ No solution found!")
         return 1
 
 
