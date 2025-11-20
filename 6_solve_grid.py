@@ -6,7 +6,7 @@ No fixed seeds
 """
 
 import sys
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 
 SIZE = 5
 TOTAL_CELLS = SIZE * SIZE
@@ -40,24 +40,50 @@ def get_next_position(row: int, col: int) -> Tuple[int, int]:
         return row + 1, 0
 
 
+def has_valid_placement(grid: List[List[int]], used: Set[int], row: int, col: int) -> bool:
+    """Check if there's at least one valid value for this position."""
+    for value in range(1, TOTAL_CELLS + 1):
+        if value not in used and not violates_c1(grid, row, col, value):
+            return True
+    return False
+
+
+def forward_check(grid: List[List[int]], used: Set[int], row: int, col: int) -> bool:
+    """Forward checking: verify that all unassigned cells still have at least one valid value."""
+    # Check next few positions to see if they still have valid placements
+    # This is a simplified forward check - we check the immediate next position
+    next_row, next_col = get_next_position(row, col)
+    if next_row < SIZE:
+        if not has_valid_placement(grid, used, next_row, next_col):
+            return False
+    return True
+
+
 def solve_grid_count(grid: List[List[int]], used: Set[int], row: int, col: int) -> int:
-    """Backtracking solver that counts all solutions."""
+    """Backtracking solver that counts all solutions with optimizations."""
     if row >= SIZE:
         return 1
     
     count = 0
+    # Collect all valid values
+    valid_values = []
     for value in range(1, TOTAL_CELLS + 1):
-        if value in used:
-            continue
-        
-        if violates_c1(grid, row, col, value):
-            continue
-        
+        if value not in used and not violates_c1(grid, row, col, value):
+            valid_values.append(value)
+    
+    # If no valid values, backtrack immediately
+    if not valid_values:
+        return 0
+    
+    # Try each valid value
+    for value in valid_values:
         grid[row][col] = value
         used.add(value)
         
-        next_row, next_col = get_next_position(row, col)
-        count += solve_grid_count(grid, used, next_row, next_col)
+        # Forward check: if next position has no valid values, skip this branch
+        if forward_check(grid, used, row, col):
+            next_row, next_col = get_next_position(row, col)
+            count += solve_grid_count(grid, used, next_row, next_col)
         
         grid[row][col] = 0
         used.remove(value)
